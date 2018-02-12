@@ -15,7 +15,7 @@ class HashMap(object):
         self.set(key, value)
 
     def __getitem__(self, key):
-        return self.get(key)
+        return self.retrieve_value(key)
 
     def need_more_buckets(self):
         if self._number_of_elements >= len(self._buckets) / 2:
@@ -41,16 +41,22 @@ class HashMap(object):
         self._buckets[target_bucket].append((key, val))
         return 1
 
+    def retrieve_value(self, key):
+        for stored_key, val in self._buckets[self.get_bucket_index(key)]:
+            if hash(stored_key) == hash(key):
+                return val
+        raise ValueError('That key does not exist')
+
     def set(self, key, val):
         self._number_of_elements += self.assign_value(key, val)
         if self.need_more_buckets():
             self.double_buckets_and_reorder_items()
 
-    def get(self, key):
-        for stored_key, val in self._buckets[self.get_bucket_index(key)]:
-            if hash(stored_key) == hash(key):
-                return val
-        raise Exception('Shit')
+    def get(self, key, default=None):
+        try:
+            return self.retrieve_value(key)
+        except ValueError:
+            return default
 
 
 if __name__ == '__main__':

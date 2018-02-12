@@ -11,8 +11,7 @@ class HashMapTestCase(unittest.TestCase):
         hashmap.set('key', 'val')
         self.assertEqual(hashmap._number_of_elements, 1)
         self.assertEqual(hashmap.get('key'), 'val')
-        with self.assertRaises(Exception):
-            hashmap.get('otherval')
+        self.assertIsNone(hashmap.get('otherval'))
 
     def test_can_set_and_get_multiple_values(self):
         hashmap = HashMap()
@@ -24,8 +23,14 @@ class HashMapTestCase(unittest.TestCase):
         self.assertEqual(hashmap._number_of_elements, 2)
         self.assertEqual(hashmap.get('otherkey'), 'otherval')
         self.assertEqual(hashmap.get('key'), 'val')
-        with self.assertRaises(Exception):
-            hashmap.get('blah')
+        self.assertIsNone(hashmap.get('blah'))
+
+    def test_get_uses_default_when_key_not_present(self):
+        hashmap = HashMap()
+        hashmap['key'] = 'val'
+        self.assertEqual(hashmap.get('key'), 'val')
+        self.assertEqual(hashmap.get('key2', 'default'), 'default')
+        self.assertEqual(hashmap.get('key2', 'blah'), 'blah')
 
     def test_can_set_and_get_many_values(self):
         hashmap = HashMap()
@@ -50,6 +55,13 @@ class HashMapTestCase(unittest.TestCase):
         hashmap['other_key'] = 'other_val'
         self.assertEqual(hashmap['key'], 'val')
         self.assertEqual(hashmap['other_key'], 'other_val')
+
+    def test_getitem_magic_method_raises_value_error_when_target_key_not_extant(self):
+        hashmap = HashMap()
+        hashmap['key'] = 'val'
+        self.assertEqual(hashmap['key'], 'val')
+        with self.assertRaises(ValueError):
+            hashmap['not_key']
 
 
 if __name__ == '__main__':
